@@ -94,7 +94,7 @@ def draw(stdscr):
             if cursor_y == pellet_coords[1]:
                 #regen_pellet()
                 pellet_coords = [random.randint(0, (width//2)), random.randint(0,height)]
-                snake_length = snake_length + 100
+                snake_length = snake_length + 4
 
 
 
