@@ -93,13 +93,13 @@ def draw(stdscr):
         if cursor_x == pellet_coords[0]:
             if cursor_y == pellet_coords[1]:
                 #regen_pellet()
-                pellet_coords = [random.randint(0,width-2), random.randint(0,height)]
-                snake_length = snake_length + 4
+                pellet_coords = [random.randint(0, (width//2)), random.randint(0,height)]
+                snake_length = snake_length + 100
 
 
 
 
-        for coord in snake_trail:
+        for coord in snake_trail[::-1]:
             if color_counter == 0:
                 stdscr.attron(curses.color_pair(second_color))
                 stdscr.addstr(coord[1], coord[0]*2, "  ")
@@ -117,6 +117,7 @@ def draw(stdscr):
                 color_counter = 0
         color_counter = 0
 
+        #stdscr.addstr(0, 0, str(pellet_coords))
 
         stdscr.attron(curses.color_pair(pellet_color))
         stdscr.addstr(pellet_coords[1], pellet_coords[0]*2, "  ")
@@ -130,8 +131,6 @@ def draw(stdscr):
     	k = stdscr.getch()
 
         time.sleep(.05)
-
-
 
 def main():
 	curses.wrapper(draw)
