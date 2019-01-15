@@ -120,7 +120,11 @@ def draw(stdscr):
         #stdscr.addstr(0, 0, str(pellet_coords))
 
         stdscr.attron(curses.color_pair(pellet_color))
-        stdscr.addstr(pellet_coords[1], pellet_coords[0]*2, "  ")
+        try:
+            stdscr.addstr(pellet_coords[1], pellet_coords[0]*2, "  ")
+        except:
+            stdscr.addstr(0,0,pellet_coords)
+            delay(10)
         stdscr.attroff(curses.color_pair(pellet_color))
 
     	stdscr.move(cursor_y, cursor_x*2 )
