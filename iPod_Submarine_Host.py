@@ -76,20 +76,29 @@ def send_out_question():
     wait = True
     while wait == True:
         elon_num = random.randint(0, len(player_list)-1)
-        print("stuck here")
         if elon_num != question_picker:
             wait = False
 
     player_list[elon_num].is_elon = True
     question = player_list[question_picker].responce
-    print("question is " + question)
+
+    print("Console: The Problem is " + question)
 
     for player in player_list:
         if player.is_elon == False:
-            sock.sendto("PRNT|" + question, (player.addr, UDP_PORT))
+            sock.sendto("PRNT| The Problem is " + question, (player.addr, UDP_PORT))
         else:
-            sock.sendto("PRNT| You're Elon", (player.addr, UDP_PORT))
+            sock.sendto("PRNT|You're Elon", (player.addr, UDP_PORT))
 
+def play_game():
+    send_message_all("ASKQ|Submit a Problem: ")
+    print("""Console: Waiting for Responces...""")
+    while responce_counter[0] != len(player_list):
+        pass
+    responce_counter[0] = 0
+    print("Console: All responces submitted!")
+    send_out_question()
+    raw_input("Console: Hit <ENTER> when ready for the next round")
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind((UDP_IP, UDP_PORT))
@@ -99,23 +108,9 @@ receiving_thread.daemon = True
 receiving_thread.start()
 
 
-raw_input("Waiting for <ENTER> to continue...")
-send_message_all("ASKQ|Submit a Question")
-print("""
-Waiting for Responces...""")
-while responce_counter[0] != len(player_list):
-    pass
-responce_counter[0] = 0
-print("all responces found")
-send_out_question()
-while True:
-    pass
+raw_input("Console: Waiting for <ENTER> to continue...")
 
-"""
 while True:
-    send_message_all("ASKQ|Submit a Question")
-    pick_question_elon()
-    send_out_question()
-    send_message_all("ASKQ|Hit <ENTER> when ready for the next round")
-"""
+    play_game()
+
 sys.exit()

@@ -26,7 +26,6 @@ def ASKQ(qtn):
 def UDP_receiver():
     while True:
         data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
-        print("debug: " + data)
         command = data[:4]
         text = data[5:]
         if command == "PRNT":
