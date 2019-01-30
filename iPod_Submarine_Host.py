@@ -23,13 +23,14 @@ class player:
         self.addr = ip
         self.name = name
         self.is_elon = False
+        self.question = ""
 
 
 
 def UDP_receiver():
     while True:
         data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
-        message_queue.append(data)
+        message_queue.append([data, addr])
 
         flag = 0
         for test_player in player_list:
@@ -37,6 +38,7 @@ def UDP_receiver():
                 flag = 1
         if flag == 0:
             player_list.append(copy.copy(player(addr[0], message_queue[0])))
+            del message_queue[0]
             print("")
             print("New player with IP " + player_list[len(player_list)-1].addr + " and name " + player_list[len(player_list)-1].name)
 
@@ -52,7 +54,7 @@ def allocate_elon():
 def send_out_question(question):
     for player in player_list:
         if player.is_elon == False:
-            sock.sendto(question, (player.addr, UDP_PORT))
+            sock.sendto("PRNT|" + question, (player.addr, UDP_PORT))
         else:
             sock.sendto("You're Elon", (player.addr, UDP_PORT))
 
@@ -64,9 +66,17 @@ receiving_thread = threading.Thread(name='UDP_receiver', target=UDP_receiver)
 receiving_thread.daemon = True
 receiving_thread.start()
 
-raw_input("Input to Start")
-send_message_all("Waiting for question...")
-allocate_elon()
-send_out_question(raw_input("What is the question? "))
+
+raw_input("Waiting for <ENTER> to continue...")
+
+bigq = raw_input("submit a question")
+send_message_all("PRNT|" + bigq)
+"""
+while True:
+    send_message_all("ASKQ|Submit a Question")
+    pick_question_elon()
+    send_out_question()
+    send_message_all("ASKQ|Hit <ENTER> when ready for the next round")
+"""
 
 sys.exit()

@@ -16,10 +16,23 @@ print "UDP target IP:", UDP_IP
 print "UDP target port:", UDP_PORT
 print "Name:", NAME
 
+def PRNT(msg):
+    print(msg)
+
+def ASKQ(qtn):
+    answer = "RSPN|" + raw_input(qtn)
+    sock.sendto(answer, (UDP_IP, UDP_PORT))
+
 def UDP_receiver():
     while True:
         data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
-        print(data)
+        print("debug: " + data)
+        command = data[:4]
+        text = data[5:]
+        if command == "PRNT":
+            PRNT(text)
+        elif command == 'ASKQ':
+            ASKQ(text)
 
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
