@@ -37,7 +37,7 @@ def UDP_receiver():
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind((personal_ip, UDP_PORT))
-sock.sendto(NAME, (UDP_IP, UDP_PORT))
+sock.sendto("JOIN|" + NAME, (UDP_IP, UDP_PORT))
 
 receiving_thread = threading.Thread(name='UDP_receiver', target=UDP_receiver)
 receiving_thread.daemon = True

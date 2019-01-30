@@ -32,15 +32,20 @@ def UDP_receiver():
         data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
         message_queue.append([data, addr])
 
-        flag = 0
-        for test_player in player_list:
-            if test_player.addr == addr[0]:
-                flag = 1
-        if flag == 0:
-            player_list.append(copy.copy(player(addr[0], message_queue[0])))
-            del message_queue[0]
-            print("")
-            print("New player with IP " + player_list[len(player_list)-1].addr + " and name " + player_list[len(player_list)-1].name)
+        command = message_queue[0][1][:4]
+        text = message_queue[0][1][5:]
+        if command == "JOIN"
+            flag = 0
+            for test_player in player_list:
+                if test_player.addr == addr[0]:
+                    flag = 1
+            if flag == 0:
+                player_list.append(copy.copy(player(addr[0], message_queue[0])))
+                print("")
+                print("New player with IP " + player_list[len(player_list)-1].addr + " and name " + player_list[len(player_list)-1].name)
+
+        del message_queue[0]
+
 
 def send_message_all(msg):
     for player in player_list:
