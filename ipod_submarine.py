@@ -42,15 +42,15 @@ def place_middle(stdscr, y, str, atr=0):
 def place_toggle_option(stdscr, y, str, bool, atr=0):
     str_begin = ((width-len(str))/2)-4
     stdscr.addstr(y, str_begin, str, atr)
-    if bool == True:
+    if bool:
         stdscr.addstr(y, str_begin + len(str) + 2, "  ", curses.color_pair(1))
     else:
         stdscr.addstr(y, str_begin + len(str) + 2, "  ", curses.color_pair(2))
 
-def place_blanks(stdscr, y, str, full_str):
+def place_blanks(stdscr, y, str, full_str, atr=0):
     str_begin = ((width-len(full_str))/2)
     paste_str = str + full_str[len(str):]
-    stdscr.addstr(y, str_begin, paste_str)
+    stdscr.addstr(y, str_begin, paste_str, atr)
 
 def check_upkey(key):
     if key == 259 or key == 119:
@@ -64,10 +64,35 @@ def check_enter(key):
     if key == 10 or key == 32:
         return True
 
+def standard_keycheck(key):
+    if check_upkey(key):
+        return -1
+    elif check_downkey(key):
+        return 1
+    else:
+        return 0
+
+def limit_selection(max, min, select):
+    if select > max:
+        return max
+    elif select < min:
+        return min
+    else:
+        return select
+
+
+
 ############### MENU FUNCTIONS ###############
+
+def host_game(stdscr):
+    raise Exception("Not there yet...")
+
+def client_game(stdscr):
+    raise Exception("Getting there... The ip you entered: " + host_ip)
 
 def ip_menu(stdscr):
     selection = 0
+    global host_ip
     input_ip = ""
 
     while True:
@@ -80,23 +105,31 @@ def ip_menu(stdscr):
                         input_ip = input_ip[:len(input_ip)-2]
                     else:
                         input_ip = input_ip[:len(input_ip)-1]
-            elif (chr(key_queue[0])).isdigit():
-                if (len(input_ip)+1) % 4 == 0 and len(input_ip) != 0:
-                    input_ip = input_ip + "."
-                input_ip = input_ip + chr(key_queue[0])
-                if len(input_ip) > 15:
-                    input_ip = input_ip[:15]
-
+            elif key_queue[0] < 255:
+                if (chr(key_queue[0])).isdigit():
+                    if (len(input_ip)+1) % 4 == 0 and len(input_ip) != 0:
+                        input_ip = input_ip + "."
+                    input_ip = input_ip + chr(key_queue[0])
+                    if len(input_ip) > 15:
+                        input_ip = input_ip[:15]
+            selection = selection + standard_keycheck(key_queue[0])
+            if check_enter(key_queue[0]):
+                del key_queue[0]
+                break
             del key_queue[0]
-
+            election = limit_selection(1, 0, selection)
         place_middle(stdscr, 7, "Host IP:")
-        place_blanks(stdscr, 10, input_ip, "---.---.---.---")
-
+        if selection == 0:
+            place_blanks(stdscr, 10, input_ip, "---.---.---.---", curses.A_BLINK)
+            place_middle(stdscr, 12, "Back")
+        elif selection == 1:
+            place_blanks(stdscr, 10, input_ip, "---.---.---.---")
+            place_middle(stdscr, 12, "Back", curses.A_BLINK)
         stdscr.refresh()
 
     if selection == 0:
-        random_questions = not random_questions
-        help_menu(stdscr)
+        host_ip = input_ip
+        client_game(stdscr)
     elif selection == 1:
         main_menu(stdscr)
 
@@ -107,20 +140,12 @@ def help_menu(stdscr):
         pass
         stdscr.clear()
         if len(key_queue) != 0:
-            if check_upkey(key_queue[0]):
-                selection = selection - 1
-            elif check_downkey(key_queue[0]):
-                selection = selection + 1
-            elif check_enter(key_queue[0]):
+            selection = selection + standard_keycheck(key_queue[0])
+            if check_enter(key_queue[0]):
                 del key_queue[0]
                 break
             del key_queue[0]
-
-            if selection < 0:
-                selection = 0
-            elif selection > 1:
-                selection = 1
-
+            selection = limit_selection(1, 0, selection)
         if selection == 0:
             place_middle(stdscr, 7, "Help and Options")
             place_toggle_option(stdscr, 10, "Random Questions", random_questions, curses.A_BLINK)
@@ -145,19 +170,12 @@ def main_menu(stdscr):
     while True:
         stdscr.clear()
         if len(key_queue) != 0:
-            if check_upkey(key_queue[0]):
-                selection = selection - 1
-            elif check_downkey(key_queue[0]):
-                selection = selection + 1
-            elif check_enter(key_queue[0]):
+            selection = selection + standard_keycheck(key_queue[0])
+            if check_enter(key_queue[0]):
                 del key_queue[0]
                 break
             del key_queue[0]
-
-            if selection < 0:
-                selection = 0
-            elif selection > 3:
-                selection = 3
+            selection = limit_selection(3, 0, selection)
 
         if selection == 0:
             place_middle(stdscr, 7, "Elon Musk's Ipod Submarine")
@@ -190,7 +208,7 @@ def main_menu(stdscr):
         ip_menu(stdscr)
     elif selection == 1:
         pass
-        host_menu(stdscr)
+        host_game(stdscr)
     elif selection == 2:
         help_menu(stdscr)
     elif selection == 3:
